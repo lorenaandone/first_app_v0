@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">first_app_v0</string>
+    <string name="loading_info_text">Loading info...</string>
+    <string name="rating_label">Rating: %s</string>
+</resources>
