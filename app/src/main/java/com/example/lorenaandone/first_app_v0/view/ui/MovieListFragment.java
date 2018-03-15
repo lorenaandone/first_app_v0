@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import io.reactivex.functions.Consumer;
+
 /**
  * Created by lorena.andone on 13.03.2018.
  */
@@ -51,16 +53,22 @@ public class MovieListFragment extends Fragment {
         listViewModel = new MovieListViewModel(getActivity().getApplication());
         listViewModel.fetchMoviesList();
 
-        List<Movie> testList = listViewModel.getMovieList();
+      listViewModel.getMovieList().subscribe(new Consumer<List<Movie>>() {
+          @Override
+          public void accept(List<Movie> movies) throws Exception {
+
+              if (movies != null && movies.size() > 0) {
+                  for (int i = 0; i < 5; i++) {
+                      System.out.println("<<<<<<<<<<Tihs is a test" + movies.get(i).getOriginalTitle());
+                  }
+              } else {
+                  Toast.makeText(getActivity(), "Not getting data", Toast.LENGTH_SHORT).show();
+              }
+          }
+      });
 
 
-        if (testList != null && testList.size() > 0) {
-            for (int i = 0; i < 5; i++) {
-                System.out.println("<<<<<<<<<<Tihs is a test" + testList.get(i).getOriginalTitle());
-            }
-        } else {
-            Toast.makeText(getActivity(), "Not getting data", Toast.LENGTH_SHORT).show();
-        }
+
 
     }
 

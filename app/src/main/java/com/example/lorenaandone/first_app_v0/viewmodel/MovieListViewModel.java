@@ -20,6 +20,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 
 /**
  * Created by lorena.andone on 14.03.2018.
@@ -31,16 +32,17 @@ public class MovieListViewModel extends AndroidViewModel{
 
     private static final String API_KEY = "af9f5802e8ea91da04ef4f18a41ebeeb";
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    PublishSubject<List<Movie>> movieListSubject = PublishSubject.create();
 
 
     public MovieListViewModel(@NonNull Application application) {
         super(application);
-        movieList = new ArrayList<>();
     }
 
     public void fetchMoviesList(){
 
         MoviesService moviesService = ApiFactory.create();
+
         Disposable disposable = moviesService.fetchTopRatedMovies(API_KEY)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -65,7 +67,8 @@ public class MovieListViewModel extends AndroidViewModel{
 
     private void updateUserDataList(List<Movie> movies){
 //        movieList.clear();
-        movieList.addAll(movies);
+        movieListSubject.onNext(movies);
+        movieListSubject.onComplete();
         if(movies != null && movies.size() > 00)
             System.out.println("<<<<<<<<<<<<<< view model test --- " + movies.get(0).getOriginalTitle());
         else
@@ -83,7 +86,7 @@ public class MovieListViewModel extends AndroidViewModel{
         compositeDisposable = null;
     }
 
-    public List<Movie> getMovieList() {
-        return movieList;
+    public PublishSubject<List<Movie>> getMovieList() {
+        return movieListSubject;
     }
 }
