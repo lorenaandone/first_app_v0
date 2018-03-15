@@ -8,6 +8,11 @@ import android.databinding.ObservableField;
 
 public class MovieViewModel {
 
+    private static final String API_KEY = "af9f5802e8ea91da04ef4f18a41ebeeb";
+
     public final ObservableField<String> movieName = new ObservableField<>();
     public final ObservableField<String> movieRating = new ObservableField<>();
+
+
+
 }

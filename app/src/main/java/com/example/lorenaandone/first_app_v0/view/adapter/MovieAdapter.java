@@ -24,6 +24,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         moviesList = TestMovieDataProvider.getTestMoviesData();
     }
 
+    public MovieAdapter(List<MovieViewModel> moviesList){
+        this.moviesList = moviesList;
+    }
+
     @Override
     public MovieViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
@@ -51,5 +55,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             super(binding.getRoot());
             this.binding = binding;
         }
+    }
+
+    public void setMoviesList(List<MovieViewModel> movies){
+        moviesList.clear();
+        moviesList.addAll(movies);
+        notifyDataSetChanged();
     }
 }
