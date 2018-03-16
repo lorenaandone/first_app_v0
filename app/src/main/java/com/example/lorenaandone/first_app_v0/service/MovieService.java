@@ -12,7 +12,7 @@ import retrofit2.http.Query;
  * Created by lorena.andone on 15.03.2018.
  */
 
-public interface MoviesService {
+public interface MovieService {
 
     @GET("movie/top_rated")
     Observable<MoviesResponse> fetchTopRatedMovies(@Query("api_key") String apiKey);

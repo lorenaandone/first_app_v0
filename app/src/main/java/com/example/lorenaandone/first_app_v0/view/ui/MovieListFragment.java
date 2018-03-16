@@ -1,7 +1,5 @@
 package com.example.lorenaandone.first_app_v0.view.ui;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,13 +12,11 @@ import android.widget.Toast;
 
 import com.example.lorenaandone.first_app_v0.R;
 import com.example.lorenaandone.first_app_v0.databinding.FragmentMovieListBinding;
-import com.example.lorenaandone.first_app_v0.model.Movie;
 import com.example.lorenaandone.first_app_v0.view.adapter.MovieAdapter;
 import com.example.lorenaandone.first_app_v0.viewmodel.MovieListViewModel;
+import com.example.lorenaandone.first_app_v0.viewmodel.MovieViewModel;
 
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 import io.reactivex.functions.Consumer;
 
@@ -46,36 +42,36 @@ public class MovieListFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        MovieAdapter movieAdapter = new MovieAdapter();
+
+        final MovieAdapter movieAdapter = new MovieAdapter();
         binding.movieList.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.movieList.setAdapter(movieAdapter);
 
         listViewModel = new MovieListViewModel(getActivity().getApplication());
-        listViewModel.fetchMoviesList();
+        binding.setMovieListViewModel(listViewModel);
+//        listViewModel.startFetchingMoviesList();
 
-      listViewModel.getMovieList().subscribe(new Consumer<List<Movie>>() {
-          @Override
-          public void accept(List<Movie> movies) throws Exception {
+        listViewModel.getTaskCommand().observe(this, new android.arch.lifecycle.Observer<MovieListViewModel.MovieListEventType>() {
+            @Override
+            public void onChanged(@Nullable MovieListViewModel.MovieListEventType movieListEventType) {
+                if(movieListEventType == MovieListViewModel.MovieListEventType.NO_INTERNET){
+                    Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
-              if (movies != null && movies.size() > 0) {
-                  for (int i = 0; i < 5; i++) {
-                      System.out.println("<<<<<<<<<<Tihs is a test" + movies.get(i).getOriginalTitle());
-                  }
-              } else {
-                  Toast.makeText(getActivity(), "Not getting data", Toast.LENGTH_SHORT).show();
-              }
-          }
-      });
-
-
-
-
+        listViewModel.getMovieList().subscribe(new Consumer<List<MovieViewModel>>() {
+            @Override
+            public void accept(List<MovieViewModel> movies) throws Exception {
+                    movieAdapter.setMoviesList(movies);
+            }
+        });
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        listViewModel.reset();
+        listViewModel.unsubscribeFromObservables();
     }
 
 }

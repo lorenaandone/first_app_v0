@@ -10,6 +10,7 @@ import com.example.lorenaandone.first_app_v0.databinding.MovieItemRowBinding;
 import com.example.lorenaandone.first_app_v0.model.TestMovieDataProvider;
 import com.example.lorenaandone.first_app_v0.viewmodel.MovieViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,14 +19,9 @@ import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder>{
 
-    private List<MovieViewModel> moviesList;
+    private List<MovieViewModel> moviesList = new ArrayList<>();
 
     public MovieAdapter(){
-        moviesList = TestMovieDataProvider.getTestMoviesData();
-    }
-
-    public MovieAdapter(List<MovieViewModel> moviesList){
-        this.moviesList = moviesList;
     }
 
     @Override

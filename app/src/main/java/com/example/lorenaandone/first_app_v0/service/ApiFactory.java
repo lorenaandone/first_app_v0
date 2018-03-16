@@ -14,7 +14,11 @@ public class ApiFactory {
 
     private static final String BASE_URL = "http://api.themoviedb.org/3/";
 
-    public static MoviesService create() {
+    private static ApiFactory instance = null;
+
+    private MovieService movieService;
+
+    private ApiFactory(){
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -29,6 +33,18 @@ public class ApiFactory {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(client)
                 .build();
-        return retrofit.create(MoviesService.class);
+
+        movieService = retrofit.create(MovieService.class);
+    }
+
+    public static final ApiFactory getInstance(){
+        if(instance == null){
+            instance = new ApiFactory();
+        }
+        return instance;
+    }
+
+    public MovieService getMovieService() {
+        return movieService;
     }
 }
