@@ -6,6 +6,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.example.lorenaandone.first_app_v0.R;
 import com.example.lorenaandone.first_app_v0.model.Movie;
 import com.example.lorenaandone.first_app_v0.service.ApiFactory;
 import com.example.lorenaandone.first_app_v0.service.MovieService;
@@ -26,41 +27,40 @@ import io.reactivex.subjects.PublishSubject;
 
 public class MovieListViewModel extends AndroidViewModel{
 
-    private static final String API_KEY = "af9f5802e8ea91da04ef4f18a41ebeeb";
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-
     PublishSubject<List<MovieViewModel>> movieListSubject = PublishSubject.create();
+    PublishSubject<Boolean> isInternetOn = PublishSubject.create();
+
     private final MutableLiveData<MovieListEventType> taskCommand = new MutableLiveData<>();
 
     public MovieListViewModel(@NonNull Application application) {
         super(application);
     }
 
-    public void startFetchingMoviesList(){
+    public void checkInternetConnection(){
 
-        Disposable checkInternetConnection = InternetConnection.getInstance().isInternetOn(getApplication().getApplicationContext())
+        Disposable checkInternetConnection = InternetConnection.getInstance()
+                .observe(getApplication().getApplicationContext())
                 .subscribeOn(Schedulers.io())
-//              .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aBoolean -> {
-                    if(aBoolean == true){
-                              fetchMoviesList();
-                              Log.i("INTERNET CONNECTION", "OK!");
-                          }else{
-//                            taskCommand.setValue(MovieListEventType.NO_INTERNET);
-                              taskCommand.postValue(MovieListEventType.NO_INTERNET);
-                              Log.i("INTERNET CONNECTION", "NO internet connection!");
-                        }
+                    isInternetOn.onNext(aBoolean);
                 },throwable -> Log.e("CHECK INTERNET", throwable.getMessage()));
 
         compositeDisposable.add(checkInternetConnection);
+
+    }
+
+    public PublishSubject<Boolean> getIsInternetOn() {
+        return isInternetOn;
     }
 
     public void fetchMoviesList(){
 
         MovieService movieService = ApiFactory.getInstance().getMovieService();
 
-        Disposable disposable = movieService.fetchTopRatedMovies(API_KEY)
+        Disposable disposable = movieService.fetchTopRatedMovies(getApplication().getResources().getString(R.string.api_key))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(moviesResponse -> updateMovieVMList(moviesResponse.getResults()),
@@ -89,6 +89,11 @@ public class MovieListViewModel extends AndroidViewModel{
             Movie movie = movies.get(i);
             movieVM.movieName.set(movie.getTitle());
             movieVM.movieRating.set(String.valueOf(movie.getVoteAverage()));
+            movieVM.movieOverview.set(movie.getOverview());
+
+            int screenWidth = getApplication().getResources().getDisplayMetrics().widthPixels;
+            String posterUrl = movie.getPosterUrl(screenWidth);
+            movieVM.moviePosterUrl.set(posterUrl);
 
             list.add(movieVM);
         }
@@ -104,10 +109,6 @@ public class MovieListViewModel extends AndroidViewModel{
 
     public PublishSubject<List<MovieViewModel>> getMovieList() {
         return movieListSubject;
-    }
-
-    public void onAddClicked(){
-           startFetchingMoviesList();
     }
 
     public MutableLiveData<MovieListEventType> getTaskCommand() {

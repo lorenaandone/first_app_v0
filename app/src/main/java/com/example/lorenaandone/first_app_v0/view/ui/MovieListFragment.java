@@ -1,10 +1,14 @@
 package com.example.lorenaandone.first_app_v0.view.ui;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.lorenaandone.first_app_v0.R;
 import com.example.lorenaandone.first_app_v0.databinding.FragmentMovieListBinding;
+import com.example.lorenaandone.first_app_v0.model.Movie;
 import com.example.lorenaandone.first_app_v0.view.adapter.MovieAdapter;
 import com.example.lorenaandone.first_app_v0.viewmodel.MovieListViewModel;
 import com.example.lorenaandone.first_app_v0.viewmodel.MovieViewModel;
@@ -30,6 +35,9 @@ public class MovieListFragment extends Fragment {
 
     FragmentMovieListBinding binding;
     MovieListViewModel listViewModel;
+    MovieAdapter movieAdapter;
+
+    OnMovieSelectedListener callback;
 
     @Nullable
     @Override
@@ -40,32 +48,30 @@ public class MovieListFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try{
+            callback = (OnMovieSelectedListener) getActivity();
+        }catch (ClassCastException ex){
+            throw new ClassCastException(getActivity().toString() + "must implement OnMovieSelectedListener");
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final MovieAdapter movieAdapter = new MovieAdapter();
-        binding.movieList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        binding.movieList.setAdapter(movieAdapter);
-
-        listViewModel = new MovieListViewModel(getActivity().getApplication());
-        binding.setMovieListViewModel(listViewModel);
-//        listViewModel.startFetchingMoviesList();
-
-        listViewModel.getTaskCommand().observe(this, new android.arch.lifecycle.Observer<MovieListViewModel.MovieListEventType>() {
-            @Override
-            public void onChanged(@Nullable MovieListViewModel.MovieListEventType movieListEventType) {
-                if(movieListEventType == MovieListViewModel.MovieListEventType.NO_INTERNET){
-                    Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-        listViewModel.getMovieList().subscribe(new Consumer<List<MovieViewModel>>() {
-            @Override
-            public void accept(List<MovieViewModel> movies) throws Exception {
-                    movieAdapter.setMoviesList(movies);
-            }
-        });
+        setupAdapter();
+        setupMovieListViewModel();
+        subscribeToInternetConnectionChanges();
+        subscribeForListData();
+        setupOnItemClicked();
     }
 
     @Override
@@ -74,4 +80,78 @@ public class MovieListFragment extends Fragment {
         listViewModel.unsubscribeFromObservables();
     }
 
+    private void setupAdapter(){
+        movieAdapter = new MovieAdapter();
+        binding.movieList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.movieList.setAdapter(movieAdapter);
+        binding.setIsLoading(true);
+    }
+
+    private void setupMovieListViewModel(){
+        listViewModel = new MovieListViewModel(getActivity().getApplication());
+        binding.setMovieListViewModel(listViewModel);
+    }
+
+
+    private void showNoInternetDialog(){
+
+        AlertDialog dialog  = new AlertDialog.Builder(getActivity()).create();
+        dialog.setTitle(getResources().getString(R.string.no_internet_dialog_title));
+        dialog.setMessage(getResources().getString(R.string.no_internet_dialog_message));
+        dialog.setIcon(R.drawable.ic_no_conection);
+        dialog.setButton(getResources().getString(R.string.no_internet_dialog_button_ok), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+               dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void subscribeToInternetConnectionChanges(){
+
+        //check internet connection and fetch the movie list
+        listViewModel.checkInternetConnection();
+        listViewModel.getIsInternetOn().subscribe(new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean aBoolean) throws Exception {
+                if(aBoolean == true){
+                    if(binding.getIsLoading()){
+                        listViewModel.fetchMoviesList();
+                        Log.i("INTERNET CONNECTION", "Internet ON, !!! List fetched !!!");
+                    }else{
+                        Log.i("INTERNET CONNECTION", "Internet ON, !!! No list fetching!!!");
+                    }
+                }else{
+                    if(binding.getIsLoading()){
+                        showNoInternetDialog();
+                        Log.i("INTERNET CONNECTION", "Internet OFF");
+                    }else{
+                        Log.i("INTERNET CONNECTION", "Internet OFF, !!! Not showing dialog!!!");
+                    }
+                }
+            }
+        });
+    }
+
+    private void subscribeForListData(){
+        listViewModel.getMovieList().subscribe(new Consumer<List<MovieViewModel>>() {
+            @Override
+            public void accept(List<MovieViewModel> movies) throws Exception {
+                movieAdapter.setMoviesList(movies);
+                binding.setIsLoading(false);
+            }
+        });
+
+    }
+
+    private void setupOnItemClicked(){
+        if(movieAdapter != null){
+            movieAdapter.getOnItemClickSubject().subscribe(new Consumer<MovieViewModel>() {
+                @Override
+                public void accept(MovieViewModel movieViewModel) throws Exception {
+                    callback.onMovieSelected(movieViewModel.movieName.get());
+                }
+            });
+        }
+    }
 }

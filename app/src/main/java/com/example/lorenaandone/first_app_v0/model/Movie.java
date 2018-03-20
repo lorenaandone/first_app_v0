@@ -39,6 +39,12 @@ public class Movie {
     @SerializedName("vote_average")
     private Double voteAverage;
 
+    static final String BASE_IMG_URL = "http://image.tmdb.org/t/p/";
+
+    //Poster image sizes
+    static final String POSTER_SIZE_W185 = "w185";
+    static final String POSTER_SIZE_W342 = "w342";
+
     public Movie(String posterPath, boolean adult, String overview, String releaseDate, List<Integer> genreIds, Integer id,
                  String originalTitle, String originalLanguage, String title, String backdropPath, Double popularity,
                  Integer voteCount, Boolean video, Double voteAverage) {
@@ -168,5 +174,12 @@ public class Movie {
 
     public void setVoteAverage(Double voteAverage) {
         this.voteAverage = voteAverage;
+    }
+
+    public String getPosterUrl(int screenWidth) {
+        if (screenWidth >= 1024) {
+            return BASE_IMG_URL + POSTER_SIZE_W342 + posterPath;
+        }
+        return BASE_IMG_URL + POSTER_SIZE_W185 + posterPath;
     }
 }

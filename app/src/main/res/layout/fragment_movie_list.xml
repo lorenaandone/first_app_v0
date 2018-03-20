@@ -6,29 +6,29 @@
 
     <data>
         <variable name="movieListViewModel" type="com.example.lorenaandone.first_app_v0.viewmodel.MovieListViewModel"/>
+        <variable name="isLoading" type="boolean"/>
     </data>
 
 
-<RelativeLayout
+<FrameLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <ProgressBar
+        android:id="@+id/load_list_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:visibleGone="@{isLoading}"
+        />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/movie_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+        app:visibleGone="@{!isLoading}"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="@dimen/fab_margin"
-        android:clickable="true"
-        android:onClick="@{()->movieListViewModel.onAddClicked()}"
-        android:src="@drawable/ic_add"/>
-</RelativeLayout>
+</FrameLayout>
 
 </layout>
