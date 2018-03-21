@@ -10,25 +10,46 @@
     </data>
 
 
-<FrameLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <ProgressBar
-        android:id="@+id/load_list_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        app:visibleGone="@{isLoading}"
-        />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/movie_list"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-        app:visibleGone="@{!isLoading}"/>
+        android:layout_height="match_parent">
 
-</FrameLayout>
+        <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:title="@string/app_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </android.support.v7.widget.Toolbar>
+
+        <ProgressBar
+            android:id="@+id/load_list_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/movie_list"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            app:visibleGone="@{isLoading}" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/movie_list"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/load_list_progress"
+            app:visibleGone="@{!isLoading}" />
+
+    </android.support.constraint.ConstraintLayout>
 
 </layout>

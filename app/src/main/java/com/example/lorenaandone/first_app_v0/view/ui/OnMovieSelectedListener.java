@@ -6,5 +6,5 @@ package com.example.lorenaandone.first_app_v0.view.ui;
 
 public interface OnMovieSelectedListener {
 
-    void onMovieSelected(String movieName);
+    void onMovieSelected(int movieId);
 }

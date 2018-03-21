@@ -2,6 +2,7 @@ package com.example.lorenaandone.first_app_v0.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import java.util.List;
  * Created by lorena.andone on 14.03.2018.
  */
 
-public class Movie {
+public class Movie implements Serializable{
     @SerializedName("poster_path")
     private String posterPath;
     @SerializedName("adult")
@@ -44,6 +45,9 @@ public class Movie {
     //Poster image sizes
     static final String POSTER_SIZE_W185 = "w185";
     static final String POSTER_SIZE_W342 = "w342";
+
+    static final String BACKDROP_SIZE_W300 = "w300";
+    static final String BACKDROP_SIZE_W780 = "w780";
 
     public Movie(String posterPath, boolean adult, String overview, String releaseDate, List<Integer> genreIds, Integer id,
                  String originalTitle, String originalLanguage, String title, String backdropPath, Double popularity,
@@ -181,5 +185,12 @@ public class Movie {
             return BASE_IMG_URL + POSTER_SIZE_W342 + posterPath;
         }
         return BASE_IMG_URL + POSTER_SIZE_W185 + posterPath;
+    }
+
+    public String getBackdropUrl(int screenWidth){
+        if(screenWidth >= 1024){
+            return BASE_IMG_URL + BACKDROP_SIZE_W780 + backdropPath;
+        }
+        return BASE_IMG_URL + BACKDROP_SIZE_W300 + backdropPath;
     }
 }

@@ -1,11 +1,10 @@
 package com.example.lorenaandone.first_app_v0.view.ui;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.example.lorenaandone.first_app_v0.R;
-import com.example.lorenaandone.first_app_v0.viewmodel.MovieViewModel;
 
 public class MainActivity extends AppCompatActivity implements OnMovieSelectedListener{
 
@@ -23,13 +22,12 @@ public class MainActivity extends AppCompatActivity implements OnMovieSelectedLi
     }
 
     @Override
-    public void onMovieSelected(String movieName) {
-
-        Toast.makeText(this, "on click : " + movieName,
-                Toast.LENGTH_LONG).show();
-
+    public void onMovieSelected(int movieId) {
 
         MovieDetailsFragment testDetailsFr = new MovieDetailsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt(MovieDetailsFragment.MOVIE_ID_KEY, movieId);
+        testDetailsFr.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
                 .addToBackStack(null)
                 .replace(R.id.fragment_container, testDetailsFr,null).commit();

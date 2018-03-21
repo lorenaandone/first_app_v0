@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+        <variable
+            name="movieDetailVM" type="com.example.lorenaandone.first_app_v0.viewmodel.MovieDetailViewModel"/>
+    </data>
+
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -20,19 +27,21 @@
             app:expandedTitleMarginEnd="64dp"
             app:expandedTitleMarginStart="48dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:title="Test toolbar text">
+            app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Title"
+            app:expandedTitleGravity="bottom|left"
+            app:title="@{movieDetailVM.movieTitle}">
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="500dp"
+                android:layout_height="wrap_content"
                 android:fitsSystemWindows="true"
                 android:minHeight="@dimen/detail_img_min_height"
-                android:scaleType="centerCrop"
-                android:src="@drawable/test_movie_poster"
+                android:scaleType="fitXY"
+                app:gladeUrl="@{movieDetailVM.imageUrl}"
                 app:layout_collapseMode="parallax" />
 
             <android.support.v7.widget.Toolbar
-                android:id="@+id/movie_details_toolbar"
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
@@ -72,6 +81,7 @@
                         android:layout_marginLeft="@dimen/spacing_large"
                         android:layout_marginRight="@dimen/spacing_large"
                         android:layout_marginTop="@dimen/spacing_large"
+                        android:text="@{movieDetailVM.movieTitle}"
                         android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
 
                     <TextView
@@ -79,7 +89,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/spacing_large"
-                        android:text="@string/some_long_text_test"
+                        android:text="@{movieDetailVM.overview}"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 
                 </LinearLayout>
@@ -91,3 +101,5 @@
     </android.support.v4.widget.NestedScrollView>
 
 </android.support.design.widget.CoordinatorLayout>
+
+</layout>

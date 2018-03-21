@@ -87,6 +87,7 @@ public class MovieListViewModel extends AndroidViewModel{
 
             MovieViewModel movieVM = new MovieViewModel();
             Movie movie = movies.get(i);
+            movieVM.movieId.set(movie.getId());
             movieVM.movieName.set(movie.getTitle());
             movieVM.movieRating.set(String.valueOf(movie.getVoteAverage()));
             movieVM.movieOverview.set(movie.getOverview());

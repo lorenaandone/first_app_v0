@@ -7,16 +7,15 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.lorenaandone.first_app_v0.R;
 import com.example.lorenaandone.first_app_v0.databinding.FragmentMovieListBinding;
-import com.example.lorenaandone.first_app_v0.model.Movie;
 import com.example.lorenaandone.first_app_v0.view.adapter.MovieAdapter;
 import com.example.lorenaandone.first_app_v0.viewmodel.MovieListViewModel;
 import com.example.lorenaandone.first_app_v0.viewmodel.MovieViewModel;
@@ -72,6 +71,8 @@ public class MovieListFragment extends Fragment {
         subscribeToInternetConnectionChanges();
         subscribeForListData();
         setupOnItemClicked();
+
+        ((AppCompatActivity)getActivity()).setSupportActionBar(binding.toolbar);
     }
 
     @Override
@@ -149,7 +150,7 @@ public class MovieListFragment extends Fragment {
             movieAdapter.getOnItemClickSubject().subscribe(new Consumer<MovieViewModel>() {
                 @Override
                 public void accept(MovieViewModel movieViewModel) throws Exception {
-                    callback.onMovieSelected(movieViewModel.movieName.get());
+                    callback.onMovieSelected(movieViewModel.movieId.get());
                 }
             });
         }
