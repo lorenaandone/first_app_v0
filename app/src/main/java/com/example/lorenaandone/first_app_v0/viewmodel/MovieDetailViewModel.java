@@ -25,6 +25,9 @@ public class MovieDetailViewModel extends AndroidViewModel{
     public final ObservableField<String> movieTitle = new ObservableField<>();
     public final ObservableField<String> overview = new ObservableField<>();
     public final ObservableField<String> imageUrl = new ObservableField<>();
+    public final ObservableField<String> posterUrl = new ObservableField<>();
+    public final ObservableField<String> rating = new ObservableField<>();
+    public final ObservableField<String> releaseDate = new ObservableField<>();
 
     private Disposable fetchMovie;
 
@@ -59,6 +62,9 @@ public class MovieDetailViewModel extends AndroidViewModel{
         overview.set(movie.getOverview());
         int screenWidth = getApplication().getResources().getDisplayMetrics().widthPixels;
         imageUrl.set(movie.getBackdropUrl(screenWidth));
+        posterUrl.set(movie.getPosterUrl(screenWidth));
+        rating.set(movie.getVoteAverage().toString());
+        releaseDate.set(movie.getReleaseDate());
     }
 
     public void unsubscribeFromObservable(){

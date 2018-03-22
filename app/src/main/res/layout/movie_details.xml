@@ -74,6 +74,57 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:id="@+id/movie_detail_poster"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/item_horizontal_margin"
+                            android:layout_alignParentLeft="true"
+                            android:scaleType="fitXY"
+                            app:gladeUrl="@{movieDetailVM.posterUrl}"/>
+
+
+                        <ImageView
+                            android:id="@+id/movie_star"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="16dp"
+                            android:layout_centerVertical="true"
+                            android:layout_toRightOf="@+id/movie_detail_poster"
+                            android:scaleType="center"
+                            android:src="@drawable/ic_star" />
+
+
+                        <TextView
+                            android:id="@+id/movie_detail_rating"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_centerVertical="true"
+                            android:layout_toRightOf="@+id/movie_star"
+                            android:fontFamily="sans-serif-condensed"
+                            android:text="@{movieDetailVM.rating}"
+                            android:textAppearance="?android:textAppearanceLarge"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:id="@+id/movie_detail_release"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/movie_detail_poster"
+                            android:layout_margin="@dimen/item_horizontal_margin"
+                            android:fontFamily="sans-serif-light"
+                            android:text="@{movieDetailVM.releaseDate}"
+                            android:textAppearance="?android:textAppearanceSmall"/>
+
+                    </RelativeLayout>
+
                     <TextView
                         android:id="@+id/title"
                         android:layout_width="match_parent"
