@@ -24,12 +24,12 @@ public class MainActivity extends AppCompatActivity implements OnMovieSelectedLi
     @Override
     public void onMovieSelected(int movieId) {
 
-        MovieDetailsFragment testDetailsFr = new MovieDetailsFragment();
+        MovieDetailsFragment detailsFragment = new MovieDetailsFragment();
         Bundle bundle = new Bundle();
         bundle.putInt(MovieDetailsFragment.MOVIE_ID_KEY, movieId);
-        testDetailsFr.setArguments(bundle);
+        detailsFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
                 .addToBackStack(null)
-                .replace(R.id.fragment_container, testDetailsFr,null).commit();
+                .replace(R.id.fragment_container, detailsFragment,null).commit();
     }
 }
