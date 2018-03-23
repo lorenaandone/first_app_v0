@@ -1,28 +1,35 @@
 package com.example.lorenaandone.first_app_v0.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by lorena.andone on 14.03.2018.
  */
 
-public class Movie implements Serializable{
+@Entity(tableName = "movie")
+public class Movie{
+
     @SerializedName("poster_path")
     private String posterPath;
+
     @SerializedName("adult")
     private boolean adult;
     @SerializedName("overview")
     private String overview;
     @SerializedName("release_date")
     private String releaseDate;
-    @SerializedName("genre_ids")
-    private List<Integer> genreIds = new ArrayList<Integer>();
+//    @SerializedName("genre_ids")
+//    private List<Integer> genreIds = new ArrayList<Integer>();
+
+    @PrimaryKey
     @SerializedName("id")
     private Integer id;
+
     @SerializedName("original_title")
     private String originalTitle;
     @SerializedName("original_language")
@@ -49,6 +56,10 @@ public class Movie implements Serializable{
     static final String BACKDROP_SIZE_W300 = "w300";
     static final String BACKDROP_SIZE_W780 = "w780";
 
+    public Movie(){
+
+    }
+
     public Movie(String posterPath, boolean adult, String overview, String releaseDate, List<Integer> genreIds, Integer id,
                  String originalTitle, String originalLanguage, String title, String backdropPath, Double popularity,
                  Integer voteCount, Boolean video, Double voteAverage) {
@@ -56,7 +67,7 @@ public class Movie implements Serializable{
         this.adult = adult;
         this.overview = overview;
         this.releaseDate = releaseDate;
-        this.genreIds = genreIds;
+//        this.genreIds = genreIds;
         this.id = id;
         this.originalTitle = originalTitle;
         this.originalLanguage = originalLanguage;
@@ -100,13 +111,13 @@ public class Movie implements Serializable{
         this.releaseDate = releaseDate;
     }
 
-    public List<Integer> getGenreIds() {
-        return genreIds;
-    }
-
-    public void setGenreIds(List<Integer> genreIds) {
-        this.genreIds = genreIds;
-    }
+//    public List<Integer> getGenreIds() {
+//        return genreIds;
+//    }
+//
+//    public void setGenreIds(List<Integer> genreIds) {
+//        this.genreIds = genreIds;
+//    }
 
     public Integer getId() {
         return id;

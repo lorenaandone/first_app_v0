@@ -7,17 +7,22 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.example.lorenaandone.first_app_v0.R;
+import com.example.lorenaandone.first_app_v0.database.AppDatabase;
 import com.example.lorenaandone.first_app_v0.model.Movie;
+import com.example.lorenaandone.first_app_v0.model.MoviesResponse;
 import com.example.lorenaandone.first_app_v0.service.ApiFactory;
 import com.example.lorenaandone.first_app_v0.service.MovieService;
 import com.example.lorenaandone.first_app_v0.utils.InternetConnection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 
+import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
@@ -70,6 +75,53 @@ public class MovieListViewModel extends AndroidViewModel{
         compositeDisposable.add(disposable);
     }
 
+
+    public void  getMoviesFromService(){
+
+        MovieService movieService = ApiFactory.getInstance().getMovieService();
+        String api_key = getApplication().getResources().getString(R.string.api_key);
+
+        AppDatabase appDB = AppDatabase.getInstance(getApplication().getApplicationContext());
+
+        Disposable disposable = io.reactivex.Observable.just(1)
+                    .subscribeOn(Schedulers.io())
+                    .flatMap(integer -> {return  movieService.fetchTopRatedMovies(api_key);})
+                    .subscribe(new Consumer<MoviesResponse>() {
+                        @Override
+                        public void accept(MoviesResponse moviesResponse) throws Exception {
+                             appDB.movieDao().insertMovieList(moviesResponse.getResults());
+                             Log.i("INSERT_DB", "insert movies into db");
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            Log.e("INSERT_DB", throwable.getMessage());
+                        }
+                    });
+
+        compositeDisposable.add(disposable);
+    }
+
+    public void getMovieDataFromDb(){
+
+        AppDatabase appDB = AppDatabase.getInstance(getApplication().getApplicationContext());
+
+        Disposable disposable = appDB.movieDao().getMovies()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<List<Movie>>() {
+                        @Override
+                        public void accept(List<Movie> movies) throws Exception {
+                                updateMovieVMList(movies);
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            Log.e("GET_DB", throwable.getMessage());
+                        }
+                    });
+        compositeDisposable.add(disposable);
+    }
 
     private void updateMovieVMList(List<Movie> movies){
 

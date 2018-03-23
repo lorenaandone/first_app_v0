@@ -31,4 +31,19 @@ public class TestMovieDataProvider {
 
         return movies;
     }
+
+    public static List<Movie> getTestMovieData(){
+
+
+        List<Movie> list = new ArrayList<>();
+        for(int i = 0; i<10; i++){
+            Movie movie = new Movie();
+            movie.setId(i+1);
+            movie.setTitle("Movie dda");
+            movie.setOverview("test test");
+
+            list.add(movie);
+        }
+        return list;
+    }
 }

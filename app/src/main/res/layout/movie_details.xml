@@ -51,6 +51,12 @@
 
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
+    
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_favorite"
+        style="@style/FabStyle"
+        app:layout_anchor="@id/app_bar_layout"
+        app:layout_anchorGravity="bottom|right|end" />
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/scroll"

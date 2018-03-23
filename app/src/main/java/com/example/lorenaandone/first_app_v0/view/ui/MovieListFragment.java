@@ -69,6 +69,8 @@ public class MovieListFragment extends Fragment {
         setupAdapter();
         setupMovieListViewModel();
         subscribeToInternetConnectionChanges();
+
+        listViewModel.getMovieDataFromDb();
         subscribeForListData();
         setupOnItemClicked();
 
@@ -117,7 +119,8 @@ public class MovieListFragment extends Fragment {
             public void accept(Boolean aBoolean) throws Exception {
                 if(aBoolean == true){
                     if(binding.getIsLoading()){
-                        listViewModel.fetchMoviesList();
+//                        listViewModel.fetchMoviesList();
+                        listViewModel.getMoviesFromService();
                         Log.i("INTERNET CONNECTION", "Internet ON, !!! List fetched !!!");
                     }else{
                         Log.i("INTERNET CONNECTION", "Internet ON, !!! No list fetching!!!");

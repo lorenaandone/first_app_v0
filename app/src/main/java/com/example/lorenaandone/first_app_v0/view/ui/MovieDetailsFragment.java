@@ -43,7 +43,8 @@ public class MovieDetailsFragment extends Fragment {
              movieId = getArguments().getInt(MOVIE_ID_KEY);
         }
 
-        detailViewModel.fetchMovieById(movieId);
+//        detailViewModel.fetchMovieById(movieId);
+        detailViewModel.getMovieByIdFromDb(movieId);
     }
 
     @Override
