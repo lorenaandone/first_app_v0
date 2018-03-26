@@ -28,5 +28,6 @@ public interface MovieDao {
     @Query("SELECT * FROM Movie WHERE Movie.id = :movieId")
     Maybe<Movie> getMovieById(int movieId);
 
-
+    @Query("DELETE FROM Movie")
+    void testDelete();
 }

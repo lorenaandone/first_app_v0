@@ -21,8 +21,6 @@ public abstract class AppDatabase extends RoomDatabase{
         if(instance == null){
             instance = Room.databaseBuilder(context, AppDatabase.class, "movie_db").build();
         }
-        String dbPath = context.getDatabasePath("movie_db").getAbsolutePath();
-        Log.i("DB_PATH", dbPath);
         return instance;
     }
 
