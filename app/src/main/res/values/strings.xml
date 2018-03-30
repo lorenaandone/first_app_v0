@@ -10,4 +10,7 @@
 
     <string name="update_data_dialog_title">New data</string>
     <string name="update_data_dialog_message">The movie list has been updated. Do you want to reload?</string>
+
+    <string name="favourite_menu_item_title">Favourite</string>
+    <string name="favourites_title">Favourite movies</string>
 </resources>

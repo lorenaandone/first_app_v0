@@ -20,8 +20,4 @@ public interface MovieService {
 
     @GET("movie/top_rated")
     Observable<MoviesResponse> fetchTopRatedMovies(@Query("api_key") String apiKey);
-
-    @GET("movie/{id}")
-    Observable<Movie> fetchMovie(@Path("id") int movieId, @Query("api_key") String apiKey);
-
 }

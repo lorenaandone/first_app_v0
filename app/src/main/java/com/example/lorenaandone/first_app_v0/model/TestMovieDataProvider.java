@@ -1,9 +1,11 @@
 package com.example.lorenaandone.first_app_v0.model;
 
+import com.example.lorenaandone.first_app_v0.viewmodel.FavouriteItemViewModel;
 import com.example.lorenaandone.first_app_v0.viewmodel.MovieViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by lorena.andone on 14.03.2018.
@@ -32,17 +34,25 @@ public class TestMovieDataProvider {
         return movies;
     }
 
-    public static List<Movie> getTestMovieData(){
+    public static Movie generateTestMovie(){
+        Movie movie = new Movie();
+        Random rand = new Random();
+        int randValue = rand.nextInt(500) + 1;
+        movie.setId(randValue);
+        movie.setTitle("Random title" + randValue);
+        movie.setOverview("test test");
 
+        return movie;
+    }
 
-        List<Movie> list = new ArrayList<>();
-        for(int i = 0; i<10; i++){
-            Movie movie = new Movie();
-            movie.setId(i+1);
-            movie.setTitle("Movie dda");
-            movie.setOverview("test test");
+    public static List<FavouriteItemViewModel> getTestFavourites(){
+        List<FavouriteItemViewModel> list  = new ArrayList<>();
 
-            list.add(movie);
+        for(int i=0; i< 20; i++){
+            FavouriteItemViewModel item = new FavouriteItemViewModel();
+            item.title.set("Movie test " + i);
+
+            list.add(item);
         }
         return list;
     }

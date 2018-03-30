@@ -34,7 +34,7 @@ public class InternetConnection {
         return instance;
     }
 
-    public Observable<Boolean> observe(final Context context){
+    public Observable<Boolean> observeConnection(final Context context){
 
         final IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);

@@ -1,5 +1,6 @@
 package com.example.lorenaandone.first_app_v0.model;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
@@ -47,6 +48,9 @@ public class Movie{
     @SerializedName("vote_average")
     private Double voteAverage;
 
+    @ColumnInfo(name = "isFavourite")
+    private int isFavourite;
+
     static final String BASE_IMG_URL = "http://image.tmdb.org/t/p/";
 
     //Poster image sizes
@@ -77,6 +81,7 @@ public class Movie{
         this.voteCount = voteCount;
         this.video = video;
         this.voteAverage = voteAverage;
+        this.isFavourite = 0;
     }
 
     public String getPosterPath() {
@@ -203,5 +208,13 @@ public class Movie{
             return BASE_IMG_URL + BACKDROP_SIZE_W780 + backdropPath;
         }
         return BASE_IMG_URL + BACKDROP_SIZE_W300 + backdropPath;
+    }
+
+    public int getIsFavourite() {
+        return isFavourite;
+    }
+
+    public void setIsFavourite(int isFavourite) {
+        this.isFavourite = isFavourite;
     }
 }

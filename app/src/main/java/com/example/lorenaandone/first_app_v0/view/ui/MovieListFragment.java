@@ -1,7 +1,6 @@
 package com.example.lorenaandone.first_app_v0.view.ui;
 
 import android.app.AlertDialog;
-import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
@@ -37,7 +36,8 @@ public class MovieListFragment extends Fragment {
     MovieListViewModel listViewModel;
     MovieAdapter movieAdapter;
 
-    OnMovieSelectedListener callback;
+    MovieNavigator callback;
+
 
     @Nullable
     @Override
@@ -51,9 +51,9 @@ public class MovieListFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         try{
-            callback = (OnMovieSelectedListener) getActivity();
+            callback = (MovieNavigator) getActivity();
         }catch (ClassCastException ex){
-            throw new ClassCastException(getActivity().toString() + "must implement OnMovieSelectedListener");
+            throw new ClassCastException(getActivity().toString() + "must implement MovieNavigator");
         }
     }
 
@@ -74,16 +74,19 @@ public class MovieListFragment extends Fragment {
 
         setupOnItemClicked();
 
-        tryGettingMovieDataFromService();
+        ((AppCompatActivity) getActivity()).setSupportActionBar(binding.toolbar);
 
-        subscribeToNavigationEvents();
-
-        ((AppCompatActivity)getActivity()).setSupportActionBar(binding.toolbar);
+        subscribeToNavigationChanges();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
         listViewModel.unsubscribeFromObservables();
     }
 
@@ -97,7 +100,6 @@ public class MovieListFragment extends Fragment {
     private void getDataFromDbAndSetAdapter(){
         listViewModel.getMovieDataFromDb();
         subscribeForListData();
-//        binding.setIsLoading(false);
     }
 
     private void setupMovieListViewModel(){
@@ -120,48 +122,25 @@ public class MovieListFragment extends Fragment {
         dialog.show();
     }
 
-    private void tryGettingMovieDataFromService(){
-
-        //check internet connection and fetch the movie list
-        listViewModel.checkInternetConnection();
-        listViewModel.getIsInternetOn().subscribe(new Consumer<Boolean>() {
-            @Override
-            public void accept(Boolean aBoolean) throws Exception {
-                if(aBoolean == true){
-//                        listViewModel.getMoviesFromService();
-                }else{
-                    if(binding.getIsLoading()){
-                        showNoInternetDialog();
-                        Log.i("INTERNET_CONNECTION", "Internet OFF");
-                    }else{
-                        Log.i("INTERNET_CONNECTION", "Internet OFF, !!! Not showing dialog!!!");
-                    }
-                }
-            }
-        });
-    }
-
-
     private void subscribeForListData(){
         listViewModel.getMovieList().subscribe(new Consumer<List<MovieViewModel>>() {
             @Override
             public void accept(List<MovieViewModel> movies) throws Exception {
-
-                    if(movies != null && movies.size()>0)
-                        binding.setIsLoading(false);
-
-                    System.out.println("<<<<<<<<<<<<Reached subscribe for list data");
-                    System.out.println("<<<<<<<<<<<< movies response size " + movies.size());
+                if(movies != null && movies.size() > 0){
                     movieAdapter.setMoviesList(movies);
-
-                    for(int i = 0 ; i< movies.size(); i++){
-                        System.out.println("<<<<<<< Test movie adapter reload ");
-                        System.out.println("<<<<<<< Title " + movies.get(i).movieName.get());
-                    }
-
+                    binding.setIsLoading(false);
+                }
             }
         });
 
+    }
+
+    private void subscribeToNavigationChanges(){
+        listViewModel.getTaskCommand().observe(this, movieListEventType -> {
+            if(movieListEventType.equals(MovieListViewModel.MovieListEventType.GO_TO_FAVOURITES)){
+                    callback.goToFavourites();
+            }
+        });
     }
 
     private void setupOnItemClicked(){
@@ -173,41 +152,5 @@ public class MovieListFragment extends Fragment {
                 }
             });
         }
-    }
-
-    private void subscribeToNavigationEvents(){
-        listViewModel.getTaskCommand().observe(this, new Observer<MovieListViewModel.MovieListEventType>() {
-            @Override
-            public void onChanged(@Nullable MovieListViewModel.MovieListEventType movieListEventType) {
-                switch (movieListEventType){
-                    case UPDATE_DATA:
-                        showUpdateDataDialog();
-                }
-            }
-        });
-    }
-
-    private void showUpdateDataDialog(){
-
-        AlertDialog dialog;
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.update_data_dialog_title);
-        builder.setMessage(getResources().getString(R.string.update_data_dialog_message));
-        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-
-            public void onClick(DialogInterface dialog, int which) {
-                getDataFromDbAndSetAdapter();
-                dialog.dismiss();
-            }
-        });
-        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int i) {
-                dialog.dismiss();
-            }
-        });
-       dialog = builder.create();
-       if(!dialog.isShowing())
-            dialog.show();
     }
 }

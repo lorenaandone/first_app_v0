@@ -10,17 +10,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.example.lorenaandone.first_app_v0.R;
-import com.example.lorenaandone.first_app_v0.service.LocalService;
+import com.example.lorenaandone.first_app_v0.service.MovieLocalService;
+import com.example.lorenaandone.first_app_v0.utils.InternetConnection;
 
-public class MainActivity extends AppCompatActivity implements OnMovieSelectedListener{
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
-    private LocalService localService;
+public class MainActivity extends AppCompatActivity implements MovieNavigator {
+
+    private MovieLocalService movieLocalService;
     boolean isServiceBound = false;
+
+    private InternetConnection internetConnection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        internetConnection = InternetConnection.getInstance();
 
         if(savedInstanceState == null){
             MovieListFragment fragment = new MovieListFragment();
@@ -33,17 +41,22 @@ public class MainActivity extends AppCompatActivity implements OnMovieSelectedLi
     @Override
     protected void onStart() {
         super.onStart();
-        Intent intent = new Intent(this, LocalService.class);
-        startService(intent);
-        boolean isBound = bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-        System.out.println("<<<<<<<<<<Service bounded: " + isBound);
+
+        internetConnection.observeConnection(getApplicationContext())
+                .observeOn(Schedulers.io())
+                .subscribe(aBoolean -> {
+                    if(aBoolean == true){
+                        startAndBindService();
+                    }
+                });
+
 
     }
 
-    @Override
-    protected void onResume(){
-        super.onResume();
-
+    private void startAndBindService(){
+        Intent intent = new Intent(this, MovieLocalService.class);
+        startService(intent);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -54,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements OnMovieSelectedLi
             isServiceBound = false;
         }
         Log.i("SERVICE", "stopping service");
-        Intent intent = new Intent(this, LocalService.class);
+        Intent intent = new Intent(this, MovieLocalService.class);
         stopService(intent);
     }
 
@@ -70,13 +83,21 @@ public class MainActivity extends AppCompatActivity implements OnMovieSelectedLi
                 .replace(R.id.fragment_container, detailsFragment,null).commit();
     }
 
+    @Override
+    public void goToFavourites() {
+        FavouritesFragment favouritesFragment = new FavouritesFragment();
+
+        getSupportFragmentManager().beginTransaction()
+                .addToBackStack(null)
+                .replace(R.id.fragment_container, favouritesFragment, null).commit();
+    }
+
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
 
-            System.out.println("<<<<<<<<<<Reached onServiceConnected ");
-            LocalService.LocalBinder localBinder = (LocalService.LocalBinder) iBinder;
-            localService = localBinder.getService();
+            MovieLocalService.LocalBinder localBinder = (MovieLocalService.LocalBinder) iBinder;
+            movieLocalService = localBinder.getService();
             isServiceBound = true;
         }
 

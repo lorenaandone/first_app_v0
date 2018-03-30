@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.LocalService">
+        <service android:name=".service.MovieLocalService">
         </service>
     </application>
 

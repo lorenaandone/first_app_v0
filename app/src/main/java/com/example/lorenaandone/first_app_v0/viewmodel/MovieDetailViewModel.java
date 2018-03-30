@@ -2,22 +2,21 @@ package com.example.lorenaandone.first_app_v0.viewmodel;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.MutableLiveData;
 import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.lorenaandone.first_app_v0.R;
 import com.example.lorenaandone.first_app_v0.database.AppDatabase;
+import com.example.lorenaandone.first_app_v0.model.Favourite;
 import com.example.lorenaandone.first_app_v0.model.Movie;
-import com.example.lorenaandone.first_app_v0.service.ApiFactory;
-import com.example.lorenaandone.first_app_v0.service.MovieService;
+import com.example.lorenaandone.first_app_v0.model.MovieDetail;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
@@ -33,71 +32,73 @@ public class MovieDetailViewModel extends AndroidViewModel{
     public final ObservableField<String> posterUrl = new ObservableField<>();
     public final ObservableField<String> rating = new ObservableField<>();
     public final ObservableField<String> releaseDate = new ObservableField<>();
+    public final ObservableField<Integer> favouriteButtonRes = new ObservableField<>();
 
-    private int currentMovieId;
+    PublishSubject<Integer> onFavoriteMovie = PublishSubject.create();
 
-    PublishSubject<Boolean> onFavoriteMovie = PublishSubject.create();
-
-    private Disposable fetchMovie;
     private CompositeDisposable disposables = new CompositeDisposable();
+
+    AppDatabase appDB;
 
     public MovieDetailViewModel(@NonNull Application application) {
         super(application);
-    }
-
-    public void fetchMovieById(int movieId){
-
-        MovieService movieService = ApiFactory.getInstance().getMovieService();
-
-        fetchMovie = movieService
-                .fetchMovie(movieId, getApplication().getResources().getString(R.string.api_key))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Movie>() {
-                    @Override
-                    public void accept(Movie movie) throws Exception {
-                        setupDetailInfo(movie);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        Log.e("FETCH_MOVIE", throwable.getMessage());
-                    }
-                });
-        disposables.add(fetchMovie);
+        appDB = AppDatabase.getInstance(getApplication().getApplicationContext());
     }
 
     public void getMovieByIdFromDb(int movieId){
-        AppDatabase appDB = AppDatabase.getInstance(getApplication().getApplicationContext());
 
         Disposable disposable = appDB.movieDao().getMovieById(movieId)
+                .map(new Function<Movie, MovieDetail>() {
+
+                    @Override
+                    public MovieDetail apply(Movie movie) throws Exception {
+
+                        int isFavourite = appDB.favouriteDao().isFavourite(movieId);
+                        return createMovieDetail(movie, isFavourite);
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Movie>() {
+                .subscribe(new Consumer<MovieDetail>() {
                     @Override
-                    public void accept(Movie movie) throws Exception {
-                        currentMovieId = movieId;
-                        setupDetailInfo(movie);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        Log.e("GET_MOVIE_BY_ID", throwable.getMessage());
+                    public void accept(MovieDetail movieDetail) throws Exception {
+                            setupDetailInfo(movieDetail);
                     }
                 });
 
         disposables.add(disposable);
     }
 
-    private void setupDetailInfo(Movie movie){
+    private MovieDetail createMovieDetail(Movie movie, int isFavourite){
 
-        movieTitle.set(movie.getTitle());
-        overview.set(movie.getOverview());
-        int screenWidth = getApplication().getResources().getDisplayMetrics().widthPixels;
-        imageUrl.set(movie.getBackdropUrl(screenWidth));
-        posterUrl.set(movie.getPosterUrl(screenWidth));
-        rating.set(movie.getVoteAverage().toString());
-        releaseDate.set(movie.getReleaseDate());
+        MovieDetail movieDetail = new MovieDetail();
+
+        movieDetail.setTitle(movie.getTitle());
+        int screenSize = getApplication().getResources().getDisplayMetrics().widthPixels;
+        movieDetail.setBackdropUrl(movie.getBackdropUrl(screenSize));
+        movieDetail.setPosterUrl(movie.getPosterUrl(screenSize));
+        movieDetail.setOverview(movie.getOverview());
+        movieDetail.setRating(movie.getVoteAverage().toString());
+        movieDetail.setReleaseDate(movie.getReleaseDate());
+        movieDetail.setIsFavourite(isFavourite);
+
+        return movieDetail;
+    }
+
+    private void setupDetailInfo(MovieDetail movieDetail){
+
+        movieTitle.set(movieDetail.getTitle());
+        overview.set(movieDetail.getOverview());
+        imageUrl.set(movieDetail.getBackdropUrl());
+        posterUrl.set(movieDetail.getPosterUrl());
+        rating.set(movieDetail.getRating());
+        releaseDate.set(movieDetail.getReleaseDate());
+
+        if(movieDetail.getIsFavourite() == 0)
+            favouriteButtonRes.set(R.drawable.ic_heart_outline);
+        else
+            favouriteButtonRes.set(R.drawable.ic_heart);
+
     }
 
     public void unsubscribeFromObservable(){
@@ -107,7 +108,24 @@ public class MovieDetailViewModel extends AndroidViewModel{
     }
 
     public void onFavoriteClicked(){
+
+        if(favouriteButtonRes.get() == R.drawable.ic_heart_outline)
+            favouriteButtonRes.set(R.drawable.ic_heart);
+        else if (favouriteButtonRes.get() == R.drawable.ic_heart)
+            favouriteButtonRes.set(R.drawable.ic_heart_outline);
+
+        onFavoriteMovie.onNext(favouriteButtonRes.get());
     }
 
+    public PublishSubject<Integer> getOnFavouriteObservable(){
+        return onFavoriteMovie;
+    }
 
+    public void updateFavouriteStatus(int movieId, int isFavourite){
+
+        Favourite favourite = new Favourite(movieId, isFavourite);
+        appDB.favouriteDao().insert(favourite);
+        Log.i("UPDATE", "Movie updated");
+
+    }
 }

@@ -1,6 +1,8 @@
 package com.example.lorenaandone.first_app_v0.view.adapter;
 
 import android.databinding.BindingAdapter;
+import android.graphics.drawable.Drawable;
+import android.support.design.widget.FloatingActionButton;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -20,5 +22,10 @@ public class CustomBindingAdapter {
     @BindingAdapter("app:gladeUrl")
     public static void loadImage(ImageView view, String url){
         Glide.with(view.getContext()).load(url).into(view);
+    }
+
+    @BindingAdapter("app:drawableRes")
+    public static void setFavouriteButtonResource(FloatingActionButton button, int drawableResource){
+        button.setImageResource(drawableResource);
     }
 }

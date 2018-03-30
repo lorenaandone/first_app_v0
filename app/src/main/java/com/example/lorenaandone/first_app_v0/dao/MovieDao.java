@@ -4,6 +4,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 import com.example.lorenaandone.first_app_v0.model.Movie;
 
@@ -11,6 +12,7 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.Single;
 
 /**
  * Created by lorena.andone on 22.03.2018.
@@ -30,4 +32,9 @@ public interface MovieDao {
 
     @Query("DELETE FROM Movie")
     void testDelete();
+
+    @Query("SELECT * FROM Movie m JOIN Favourite f ON m.id = f.id WHERE f.isFavourite = 1")
+    Flowable<List<Movie>> getFavourites();
+
+
 }

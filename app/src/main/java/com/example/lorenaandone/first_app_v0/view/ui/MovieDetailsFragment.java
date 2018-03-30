@@ -12,6 +12,11 @@ import com.example.lorenaandone.first_app_v0.R;
 import com.example.lorenaandone.first_app_v0.databinding.MovieDetailsBinding;
 import com.example.lorenaandone.first_app_v0.viewmodel.MovieDetailViewModel;
 
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Created by lorena.andone on 19.03.2018.
  */
@@ -44,6 +49,19 @@ public class MovieDetailsFragment extends Fragment {
         }
 
         detailViewModel.getMovieByIdFromDb(movieId);
+
+        detailViewModel.getOnFavouriteObservable()
+                .debounce(2000, TimeUnit.MILLISECONDS)
+                .observeOn(Schedulers.io())
+                .subscribe(new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) throws Exception {
+                if(integer == R.drawable.ic_heart){
+                    detailViewModel.updateFavouriteStatus(movieId, 1);
+                } else if(integer == R.drawable.ic_heart_outline)
+                    detailViewModel.updateFavouriteStatus(movieId, 0);
+            }
+        });
     }
 
     @Override

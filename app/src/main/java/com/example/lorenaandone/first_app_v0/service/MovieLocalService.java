@@ -9,8 +9,11 @@ import android.util.Log;
 
 import com.example.lorenaandone.first_app_v0.R;
 import com.example.lorenaandone.first_app_v0.database.AppDatabase;
+import com.example.lorenaandone.first_app_v0.model.Movie;
 import com.example.lorenaandone.first_app_v0.model.MoviesResponse;
+import com.example.lorenaandone.first_app_v0.model.TestMovieDataProvider;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.disposables.Disposable;
@@ -21,7 +24,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by lorena.andone on 26.03.2018.
  */
 
-public class LocalService extends Service {
+public class MovieLocalService extends Service {
 
     private IBinder localIBinder = new LocalBinder();
     Disposable disposable;
@@ -58,8 +61,10 @@ public class LocalService extends Service {
                     @Override
                     public void accept(MoviesResponse moviesResponse) throws Exception {
 
+//                        List<Movie> resultList = moviesResponse.getResults();
+//                        resultList.add(TestMovieDataProvider.generateTestMovie());
+
                         appDatabase.movieDao().insertMovieList(moviesResponse.getResults());
-//                        taskCommand.postValue(MovieListViewModel.MovieListEventType.UPDATE_DATA);
                         Log.i("INSERT_DB", "insert movies into db");
                         Log.i("RETROFIT", "get data from service");
                     }
@@ -73,8 +78,9 @@ public class LocalService extends Service {
 
     public class LocalBinder extends Binder {
 
-       public LocalService getService(){
-            return LocalService.this;
+       public MovieLocalService getService(){
+            return MovieLocalService.this;
         }
+
     }
 }
