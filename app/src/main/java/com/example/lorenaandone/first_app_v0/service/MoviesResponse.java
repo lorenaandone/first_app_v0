@@ -1,5 +1,6 @@
-package com.example.lorenaandone.first_app_v0.model;
+package com.example.lorenaandone.first_app_v0.service;
 
+import com.example.lorenaandone.first_app_v0.model.Movie;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;

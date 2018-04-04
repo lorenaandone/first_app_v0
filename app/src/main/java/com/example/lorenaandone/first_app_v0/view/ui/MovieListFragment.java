@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.lorenaandone.first_app_v0.R;
 import com.example.lorenaandone.first_app_v0.databinding.FragmentMovieListBinding;
@@ -22,7 +23,9 @@ import com.example.lorenaandone.first_app_v0.viewmodel.MovieViewModel;
 
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by lorena.andone on 13.03.2018.
@@ -73,6 +76,7 @@ public class MovieListFragment extends Fragment {
         getDataFromDbAndSetAdapter();
 
         setupOnItemClicked();
+        setupOnFavouriteClicked();
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(binding.toolbar);
 
@@ -91,7 +95,7 @@ public class MovieListFragment extends Fragment {
     }
 
     private void setupAdapter(){
-        movieAdapter = new MovieAdapter();
+        movieAdapter = new MovieAdapter(getActivity());
         binding.movieList.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.movieList.setAdapter(movieAdapter);
         binding.setIsLoading(true);
@@ -105,21 +109,6 @@ public class MovieListFragment extends Fragment {
     private void setupMovieListViewModel(){
         listViewModel = new MovieListViewModel(getActivity().getApplication());
         binding.setMovieListViewModel(listViewModel);
-    }
-
-
-    private void showNoInternetDialog(){
-
-        AlertDialog dialog  = new AlertDialog.Builder(getActivity()).create();
-        dialog.setTitle(getResources().getString(R.string.no_internet_dialog_title));
-        dialog.setMessage(getResources().getString(R.string.no_internet_dialog_message));
-        dialog.setIcon(R.drawable.ic_no_conection);
-        dialog.setButton(getResources().getString(R.string.no_internet_dialog_button_ok), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-               dialog.dismiss();
-            }
-        });
-        dialog.show();
     }
 
     private void subscribeForListData(){
@@ -151,6 +140,24 @@ public class MovieListFragment extends Fragment {
                     callback.onMovieSelected(movieViewModel.movieId.get());
                 }
             });
+        }
+    }
+
+    private void setupOnFavouriteClicked(){
+        if(movieAdapter != null){
+            movieAdapter.getOnAddToFavouriteClick()
+                    .flatMap(movieViewModel -> {return listViewModel.updateFavouriteStatus(movieViewModel.movieId.get());})
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(new Consumer<Integer>() {
+                        @Override
+                        public void accept(Integer integer) throws Exception {
+                            if(integer > 0){
+                                Toast.makeText(getActivity(), "Added to favs", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                    });
         }
     }
 }

@@ -11,6 +11,11 @@ import com.example.lorenaandone.first_app_v0.database.AppDatabase;
 import com.example.lorenaandone.first_app_v0.model.Favourite;
 import com.example.lorenaandone.first_app_v0.model.Movie;
 import com.example.lorenaandone.first_app_v0.model.MovieDetail;
+import com.example.lorenaandone.first_app_v0.model.MovieGenre;
+import com.example.lorenaandone.first_app_v0.utils.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -33,6 +38,7 @@ public class MovieDetailViewModel extends AndroidViewModel{
     public final ObservableField<String> rating = new ObservableField<>();
     public final ObservableField<String> releaseDate = new ObservableField<>();
     public final ObservableField<Integer> favouriteButtonRes = new ObservableField<>();
+    public final ObservableField<String> genres = new ObservableField<>();
 
     PublishSubject<Integer> onFavoriteMovie = PublishSubject.create();
 
@@ -54,7 +60,11 @@ public class MovieDetailViewModel extends AndroidViewModel{
                     public MovieDetail apply(Movie movie) throws Exception {
 
                         int isFavourite = appDB.favouriteDao().isFavourite(movieId);
-                        return createMovieDetail(movie, isFavourite);
+                        List<String> movieGenres = getGenresForMovie(movie);
+                        for (int i = 0; i< movieGenres.size(); i++){
+                            Log.i("GENRES", "movie genres: " + movieGenres.get(i));
+                        }
+                        return createMovieDetail(movie, isFavourite, movieGenres);
                     }
                 })
                 .subscribeOn(Schedulers.io())
@@ -69,7 +79,20 @@ public class MovieDetailViewModel extends AndroidViewModel{
         disposables.add(disposable);
     }
 
-    private MovieDetail createMovieDetail(Movie movie, int isFavourite){
+    private List<String> getGenresForMovie(Movie movie){
+
+        List<String> genreResult = new ArrayList<>();
+        List<Integer> movieGenres = movie.getGenreIds();
+
+        for(int i=0; i< movieGenres.size(); i++){
+            String name = appDB.genreDao().getGenreNameById(movieGenres.get(i));
+            genreResult.add(name);
+        }
+
+        return genreResult;
+    }
+
+    private MovieDetail createMovieDetail(Movie movie, int isFavourite, List<String> genres){
 
         MovieDetail movieDetail = new MovieDetail();
 
@@ -81,6 +104,7 @@ public class MovieDetailViewModel extends AndroidViewModel{
         movieDetail.setRating(movie.getVoteAverage().toString());
         movieDetail.setReleaseDate(movie.getReleaseDate());
         movieDetail.setIsFavourite(isFavourite);
+        movieDetail.setMovieGenres(genres);
 
         return movieDetail;
     }
@@ -99,6 +123,7 @@ public class MovieDetailViewModel extends AndroidViewModel{
         else
             favouriteButtonRes.set(R.drawable.ic_heart);
 
+        genres.set(StringUtils.formatStringsList(movieDetail.getMovieGenres()));
     }
 
     public void unsubscribeFromObservable(){

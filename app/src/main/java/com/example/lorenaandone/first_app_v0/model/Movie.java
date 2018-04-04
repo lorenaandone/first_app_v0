@@ -3,9 +3,12 @@ package com.example.lorenaandone.first_app_v0.model;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverters;
 
+import com.example.lorenaandone.first_app_v0.database.Converters;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,8 +27,6 @@ public class Movie{
     private String overview;
     @SerializedName("release_date")
     private String releaseDate;
-//    @SerializedName("genre_ids")
-//    private List<Integer> genreIds = new ArrayList<Integer>();
 
     @PrimaryKey
     @SerializedName("id")
@@ -51,6 +52,9 @@ public class Movie{
     @ColumnInfo(name = "isFavourite")
     private int isFavourite;
 
+    @SerializedName("genre_ids")
+    private ArrayList<Integer> genreIds = new ArrayList<>();
+
     static final String BASE_IMG_URL = "http://image.tmdb.org/t/p/";
 
     //Poster image sizes
@@ -64,14 +68,13 @@ public class Movie{
 
     }
 
-    public Movie(String posterPath, boolean adult, String overview, String releaseDate, List<Integer> genreIds, Integer id,
+    public Movie(String posterPath, boolean adult, String overview, String releaseDate, Integer id,
                  String originalTitle, String originalLanguage, String title, String backdropPath, Double popularity,
-                 Integer voteCount, Boolean video, Double voteAverage) {
+                 Integer voteCount, Boolean video, Double voteAverage, List<Integer> genreIds) {
         this.posterPath = posterPath;
         this.adult = adult;
         this.overview = overview;
         this.releaseDate = releaseDate;
-//        this.genreIds = genreIds;
         this.id = id;
         this.originalTitle = originalTitle;
         this.originalLanguage = originalLanguage;
@@ -82,6 +85,7 @@ public class Movie{
         this.video = video;
         this.voteAverage = voteAverage;
         this.isFavourite = 0;
+        this.genreIds = (ArrayList<Integer>) genreIds;
     }
 
     public String getPosterPath() {
@@ -116,13 +120,6 @@ public class Movie{
         this.releaseDate = releaseDate;
     }
 
-//    public List<Integer> getGenreIds() {
-//        return genreIds;
-//    }
-//
-//    public void setGenreIds(List<Integer> genreIds) {
-//        this.genreIds = genreIds;
-//    }
 
     public Integer getId() {
         return id;
@@ -216,5 +213,13 @@ public class Movie{
 
     public void setIsFavourite(int isFavourite) {
         this.isFavourite = isFavourite;
+    }
+
+    public ArrayList<Integer> getGenreIds() {
+        return genreIds;
+    }
+
+    public void setGenreIds(ArrayList<Integer> genreIds) {
+        this.genreIds = genreIds;
     }
 }

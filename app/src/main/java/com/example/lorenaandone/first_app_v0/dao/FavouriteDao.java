@@ -14,9 +14,15 @@ import com.example.lorenaandone.first_app_v0.model.Favourite;
 @Dao
 public interface FavouriteDao {
 
+//    @Insert(onConflict = OnConflictStrategy.REPLACE)
+//    void insert(Favourite favourite);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(Favourite favourite);
+    long insert(Favourite favourite);
 
     @Query("SELECT isFavourite FROM favourite WHERE favourite.id = :id")
     int isFavourite(int id);
+
+    @Query("DELETE FROM favourite WHERE favourite.id = :id")
+    void deleteFavourite(int id);
 }

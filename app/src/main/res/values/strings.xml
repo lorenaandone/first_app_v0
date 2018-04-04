@@ -13,4 +13,9 @@
 
     <string name="favourite_menu_item_title">Favourite</string>
     <string name="favourites_title">Favourite movies</string>
+    <string name="add_to_favourite_menu_title">Add to favourite</string>
+
+    <string name="delete_favourite_menu_title">Delete</string>
+    <string name="open_favourite_menu_title">Open</string>
+    <string name="test_favourite_menu_title">Do something else</string>
 </resources>

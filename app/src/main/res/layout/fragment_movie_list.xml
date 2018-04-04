@@ -29,6 +29,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
+                android:id="@+id/favourite_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
@@ -37,6 +38,7 @@
                 android:layout_alignParentRight="true"
                 android:clickable="true"
                 android:layout_marginRight="5dp"
+                app:visibleGone="@{!isLoading}"
                 android:onClick="@{() -> movieListViewModel.onShowFavouritesClicked()}"/>
 
         </android.support.v7.widget.Toolbar>

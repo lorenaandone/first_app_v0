@@ -1,6 +1,7 @@
 package com.example.lorenaandone.first_app_v0.viewmodel;
 
 import android.databinding.ObservableField;
+import android.databinding.ObservableInt;
 
 /**
  * Created by lorena.andone on 29.03.2018.
@@ -8,6 +9,7 @@ import android.databinding.ObservableField;
 
 public class FavouriteItemViewModel {
 
+    public ObservableInt id = new ObservableInt();
     public ObservableField<String> poster = new ObservableField<>();
     public ObservableField<String> title = new ObservableField<>();
 }

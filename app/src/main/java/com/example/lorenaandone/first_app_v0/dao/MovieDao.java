@@ -7,6 +7,7 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 import com.example.lorenaandone.first_app_v0.model.Movie;
+import com.example.lorenaandone.first_app_v0.model.MovieDetail;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ public interface MovieDao {
     @Query("SELECT * FROM Movie")
     Flowable<List<Movie>> getMovies();
 
+
     @Query("SELECT * FROM Movie WHERE Movie.id = :movieId")
     Maybe<Movie> getMovieById(int movieId);
 
@@ -35,6 +37,9 @@ public interface MovieDao {
 
     @Query("SELECT * FROM Movie m JOIN Favourite f ON m.id = f.id WHERE f.isFavourite = 1")
     Flowable<List<Movie>> getFavourites();
+
+    @Query("SELECT COUNT(*) FROM Movie")
+    Single<Integer> getMovieCount();
 
 
 }

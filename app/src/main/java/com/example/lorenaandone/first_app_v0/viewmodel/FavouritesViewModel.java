@@ -61,6 +61,7 @@ public class FavouritesViewModel extends AndroidViewModel{
 
             FavouriteItemViewModel item = new FavouriteItemViewModel();
 
+            item.id.set(favourites.get(i).getId());
             item.title.set(favourites.get(i).getTitle());
             int screenWidth = getApplication().getResources().getDisplayMetrics().widthPixels;
             item.poster.set(favourites.get(i).getPosterUrl(screenWidth));

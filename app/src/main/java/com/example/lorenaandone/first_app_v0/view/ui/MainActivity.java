@@ -106,4 +106,5 @@ public class MainActivity extends AppCompatActivity implements MovieNavigator {
             isServiceBound = false;
         }
     };
+
 }

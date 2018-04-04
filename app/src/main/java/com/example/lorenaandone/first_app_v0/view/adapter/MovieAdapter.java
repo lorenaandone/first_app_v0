@@ -1,8 +1,12 @@
 package com.example.lorenaandone.first_app_v0.view.adapter;
 
+import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -24,8 +28,15 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     private List<MovieViewModel> moviesList = new ArrayList<>();
 
     private final PublishSubject<MovieViewModel> onItemClick = PublishSubject.create();
+    private final PublishSubject<MovieViewModel> onAddToFavouriteClick = PublishSubject.create();
+
+    private Context mContext;
 
     public MovieAdapter(){
+    }
+
+    public MovieAdapter(Context cOntext){
+        mContext = cOntext;
     }
 
     @Override
@@ -44,12 +55,20 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         holder.binding.setMovieVM(movie);
         holder.binding.executePendingBindings();
 
+        holder.binding.overflow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPopupMenu(view, movie);
+            }
+        });
+
         holder.binding.getRoot().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onItemClick.onNext(movie);
             }
         });
+
     }
 
     @Override
@@ -75,5 +94,36 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     public PublishSubject<MovieViewModel> getOnItemClickSubject() {
         return onItemClick;
+    }
+
+    private void showPopupMenu(View view, MovieViewModel movieViewModel){
+
+        PopupMenu popupMenu = new PopupMenu(mContext, view);
+        MenuInflater inflater = popupMenu.getMenuInflater();
+        inflater.inflate(R.menu.menu_movie_item, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenuItemClick(movieViewModel));
+        popupMenu.show();
+    }
+
+    private class PopupMenuItemClick implements PopupMenu.OnMenuItemClickListener{
+
+        private MovieViewModel movieViewModel;
+
+        public PopupMenuItemClick(MovieViewModel movieViewModel){
+            this.movieViewModel = movieViewModel;
+        }
+
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            if(item.getItemId() == R.id.action_add_to_favourite){
+                   onAddToFavouriteClick.onNext(movieViewModel);
+                   return true;
+            }
+            return false;
+        }
+    }
+
+    public PublishSubject<MovieViewModel> getOnAddToFavouriteClick() {
+        return onAddToFavouriteClick;
     }
 }

@@ -5,6 +5,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="android.view.View"/>
+
         <variable
             name="movieVM" type="com.example.lorenaandone.first_app_v0.viewmodel.MovieViewModel"/>
     </data>
@@ -77,8 +79,7 @@
                 android:layout_marginTop="@dimen/ic_movie_overflow_margin_top"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_dots"
-                android:clickable="true"
-                android:onClick="@{()->movieVM.onTestClicked()}"/>
+                android:clickable="true" />
 
         </RelativeLayout>
 

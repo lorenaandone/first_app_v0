@@ -8,17 +8,18 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.lorenaandone.first_app_v0.R;
+import com.example.lorenaandone.first_app_v0.dao.GenreDao;
 import com.example.lorenaandone.first_app_v0.database.AppDatabase;
-import com.example.lorenaandone.first_app_v0.model.Movie;
-import com.example.lorenaandone.first_app_v0.model.MoviesResponse;
-import com.example.lorenaandone.first_app_v0.model.TestMovieDataProvider;
+import com.example.lorenaandone.first_app_v0.model.MovieGenre;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 
 /**
  * Created by lorena.andone on 26.03.2018.
@@ -27,12 +28,42 @@ import io.reactivex.schedulers.Schedulers;
 public class MovieLocalService extends Service {
 
     private IBinder localIBinder = new LocalBinder();
-    Disposable disposable;
+    private AppDatabase appDatabase;
+    private MovieService movieService;
+    private String api_key;
+
+    private int initialInterval = 0;
+
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+
+    private PublishSubject<Integer> countPublish = PublishSubject.create();
+
 
     @Override
     public void onCreate() {
         super.onCreate();
-        getRetrofitData();
+
+        appDatabase = AppDatabase.getInstance(getApplicationContext());
+        movieService = ApiFactory.getInstance().getMovieService();
+        api_key = getApplication().getResources().getString(R.string.api_key);
+
+        getMovieCountFromDb();
+        getMovieGenres();
+
+
+        countPublish.subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) throws Exception {
+                if(integer > 0)
+                    initialInterval = 5*60*1000;
+                else
+                    initialInterval = 0;
+                Log.i("SERVICE", "initial interval from subscribe to count: " + initialInterval);
+                getRetrofitData(initialInterval);
+            }
+        });
     }
 
     @Nullable
@@ -44,29 +75,25 @@ public class MovieLocalService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(disposable != null && !disposable.isDisposed())
-            disposable.dispose();
+        if(compositeDisposable != null && !compositeDisposable.isDisposed())
+            compositeDisposable.dispose();
     }
 
-    public void getRetrofitData(){
+    private void getRetrofitData(int initialInterval){
 
-        MovieService movieService = ApiFactory.getInstance().getMovieService();
-        String api_key = getApplication().getResources().getString(R.string.api_key);
-        AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
-
-        disposable = io.reactivex.Observable.interval(1,30*60*1000, TimeUnit.MILLISECONDS)
+        Disposable disposable = io.reactivex.Observable.interval(initialInterval,5*60*1000, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
-                .flatMap(integer -> {return  movieService.fetchTopRatedMovies(api_key);})
+                .flatMap(integer -> {
+                    Log.i("SERVICE", "initial interval " + initialInterval);
+                    return movieService.fetchTopRatedMovies(api_key);})
                 .subscribe(new Consumer<MoviesResponse>() {
                     @Override
                     public void accept(MoviesResponse moviesResponse) throws Exception {
 
-//                        List<Movie> resultList = moviesResponse.getResults();
-//                        resultList.add(TestMovieDataProvider.generateTestMovie());
-
                         appDatabase.movieDao().insertMovieList(moviesResponse.getResults());
-                        Log.i("INSERT_DB", "insert movies into db");
-                        Log.i("RETROFIT", "get data from service");
+//                        appDatabase.movieDao().insertMovieList(resultList);
+                        Log.i("SERVICE", "insert movies into db");
+                        Log.i("SERVICE", "get data from service");
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -74,6 +101,49 @@ public class MovieLocalService extends Service {
                         Log.e("INSERT_DB", throwable.getMessage());
                     }
                 });
+
+        compositeDisposable.add(disposable);
+    }
+
+    private void getMovieCountFromDb(){
+
+        Disposable getCount = appDatabase.movieDao().getMovieCount()
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) throws Exception {
+                        countPublish.onNext(integer);
+//                        countPublish.onComplete();
+                        Log.i("SERVICE", "movie nr in db: " + integer);
+                    }
+                });
+
+        compositeDisposable.add(getCount);
+    }
+
+    private void getMovieGenres(){
+        Disposable disposable = movieService.fetchMovieGenres(api_key)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Consumer<GenderResponse>() {
+                    @Override
+                    public void accept(GenderResponse genreResponse) throws Exception {
+
+                        List<MovieGenre> genres = genreResponse.getResponses();
+                        appDatabase.genreDao().insertAll(genres);
+
+                        for (int i = 0; i < genres.size(); i++) {
+                            Log.i("SERVCE", "movie genre: " + genres.get(i).getName());
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e("GET_GENRES", throwable.getMessage());
+                    }
+                });
+
+        compositeDisposable.add(disposable);
     }
 
     public class LocalBinder extends Binder {

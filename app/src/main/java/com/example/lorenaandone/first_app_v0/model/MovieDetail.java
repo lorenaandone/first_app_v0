@@ -1,5 +1,7 @@
 package com.example.lorenaandone.first_app_v0.model;
 
+import java.util.List;
+
 /**
  * Created by lorena.andone on 30.03.2018.
  */
@@ -13,6 +15,7 @@ public class MovieDetail {
     private String rating;
     private String releaseDate;
     private int isFavourite;
+    private List<String> movieGenres;
 
     public String getTitle() {
         return title;
@@ -68,5 +71,13 @@ public class MovieDetail {
 
     public void setIsFavourite(int isFavourite) {
         this.isFavourite = isFavourite;
+    }
+
+    public List<String> getMovieGenres() {
+        return movieGenres;
+    }
+
+    public void setMovieGenres(List<String> movieGenres) {
+        this.movieGenres = movieGenres;
     }
 }
