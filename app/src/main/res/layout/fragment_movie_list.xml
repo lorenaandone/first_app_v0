@@ -7,6 +7,8 @@
     <data>
         <variable name="movieListViewModel" type="com.example.lorenaandone.first_app_v0.viewmodel.MovieListViewModel"/>
         <variable name="isLoading" type="boolean"/>
+        <variable
+            name="clickHandler" type="com.example.lorenaandone.first_app_v0.view.listeners.ClickHandler"/>
     </data>
 
 
@@ -28,18 +30,33 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:id="@+id/favourite_button"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:src="@drawable/ic_heart"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:clickable="true"
+                android:layout_gravity="right"
                 android:layout_marginRight="5dp"
-                app:visibleGone="@{!isLoading}"
-                android:onClick="@{() -> movieListViewModel.onShowFavouritesClicked()}"/>
+                app:visibleGone="@{!isLoading}">
+
+                <ImageView
+                    android:id="@+id/filter_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_filter"
+                    android:layout_marginRight="10dp"
+                    android:clickable="true"
+                    android:onClick="@{clickHandler::onFilterClicked}"/>
+
+                <ImageView
+                    android:id="@+id/favourite_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_heart"
+                    android:clickable="true"
+                    android:onClick="@{() -> movieListViewModel.onShowFavouritesClicked()}"/>
+
+            </LinearLayout>
 
         </android.support.v7.widget.Toolbar>
 

@@ -1,15 +1,12 @@
 package com.example.lorenaandone.first_app_v0.view.ui;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +14,7 @@ import android.widget.Toast;
 
 import com.example.lorenaandone.first_app_v0.R;
 import com.example.lorenaandone.first_app_v0.databinding.FragmentMovieListBinding;
+import com.example.lorenaandone.first_app_v0.view.listeners.ClickHandler;
 import com.example.lorenaandone.first_app_v0.view.adapter.MovieAdapter;
 import com.example.lorenaandone.first_app_v0.viewmodel.MovieListViewModel;
 import com.example.lorenaandone.first_app_v0.viewmodel.MovieViewModel;
@@ -31,7 +29,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by lorena.andone on 13.03.2018.
  */
 
-public class MovieListFragment extends Fragment {
+public class MovieListFragment extends Fragment{
 
     public static final String TAG = "MovieListFragment";
 
@@ -40,7 +38,6 @@ public class MovieListFragment extends Fragment {
     MovieAdapter movieAdapter;
 
     MovieNavigator callback;
-
 
     @Nullable
     @Override
@@ -72,6 +69,7 @@ public class MovieListFragment extends Fragment {
 
         setupAdapter();
         setupMovieListViewModel();
+        setupClickHandler();
 
         getDataFromDbAndSetAdapter();
 
@@ -109,6 +107,11 @@ public class MovieListFragment extends Fragment {
     private void setupMovieListViewModel(){
         listViewModel = new MovieListViewModel(getActivity().getApplication());
         binding.setMovieListViewModel(listViewModel);
+    }
+
+    private void setupClickHandler(){
+        ClickHandler clickHandler = new ClickHandler(getActivity());
+        binding.setClickHandler(clickHandler);
     }
 
     private void subscribeForListData(){

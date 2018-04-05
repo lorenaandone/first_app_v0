@@ -6,6 +6,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.databinding.ObservableBoolean;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.View;
 
 import com.example.lorenaandone.first_app_v0.database.AppDatabase;
 import com.example.lorenaandone.first_app_v0.model.Favourite;
@@ -33,8 +34,6 @@ public class MovieListViewModel extends AndroidViewModel{
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     PublishSubject<List<MovieViewModel>> movieListSubject = PublishSubject.create();
-    PublishSubject<Boolean> isInternetOn = PublishSubject.create();
-
     AppDatabase appDatabase;
 
     private final MutableLiveData<MovieListEventType> taskCommand = new MutableLiveData<>();
@@ -111,8 +110,9 @@ public class MovieListViewModel extends AndroidViewModel{
           taskCommand.setValue(MovieListEventType.GO_TO_FAVOURITES);
     }
 
+
     public enum MovieListEventType{
-        GO_TO_FAVOURITES
+        GO_TO_FAVOURITES, SHOW_FILTER_OPTIONS
     }
 
     public Observable<Integer> updateFavouriteStatus(int movieId){

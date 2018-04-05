@@ -61,9 +61,7 @@ public class MovieDetailViewModel extends AndroidViewModel{
 
                         int isFavourite = appDB.favouriteDao().isFavourite(movieId);
                         List<String> movieGenres = getGenresForMovie(movie);
-                        for (int i = 0; i< movieGenres.size(); i++){
-                            Log.i("GENRES", "movie genres: " + movieGenres.get(i));
-                        }
+
                         return createMovieDetail(movie, isFavourite, movieGenres);
                     }
                 })
